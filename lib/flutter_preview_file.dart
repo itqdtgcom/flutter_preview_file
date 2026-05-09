@@ -1,6 +1,11 @@
-import 'flutter_preview_file_platform_interface.dart';
 import 'dart:typed_data';
+
+import 'flutter_preview_file_platform_interface.dart';
+import 'src/file_tools_models.dart';
+import 'src/file_tools_service.dart';
+import 'src/file_tools_task_control.dart';
 import 'src/pdf/pdf_to_word_converter.dart';
+import 'src/preview/preview_document_kind.dart';
 import 'src/word/word_to_pdf_converter.dart';
 
 export 'package:archive/archive_io.dart' show ZipFileEncoder;
@@ -31,9 +36,17 @@ export 'package:syncfusion_flutter_pdf/pdf.dart'
 export 'src/common/preview_builders.dart';
 export 'src/excel/excel_file_controller.dart';
 export 'src/excel/excel_file_view.dart';
+export 'src/file_tools_models.dart';
+export 'src/file_tools_service.dart' show FileToolsProgressCallback;
+export 'src/file_tools_task_control.dart';
 export 'src/pdf/pdf_file_view.dart';
+export 'src/preview/preview_document_kind.dart';
+export 'src/text_code/text_code_file_view.dart';
+export 'src/text_code/text_preview_config.dart';
 export 'src/word/word_file_controller.dart';
 export 'src/word/word_file_view.dart';
+export 'src/zip/zip_archive_parser.dart';
+export 'src/zip/zip_archive_view.dart';
 
 class FlutterPreviewFile {
   const FlutterPreviewFile._();
@@ -110,6 +123,18 @@ class FlutterPreviewFile {
     return FlutterPreviewFilePlatform.instance.scanFile(path);
   }
 
+  static Future<bool> saveImageToGallery({
+    required String sourcePath,
+    required String displayName,
+    String? relativePath,
+  }) {
+    return FlutterPreviewFilePlatform.instance.saveImageToGallery(
+      sourcePath: sourcePath,
+      displayName: displayName,
+      relativePath: relativePath,
+    );
+  }
+
   static Future<int> getPdfPageCount(String path) {
     return FlutterPreviewFilePlatform.instance.getPdfPageCount(path);
   }
@@ -138,5 +163,165 @@ class FlutterPreviewFile {
       pageIndex: pageIndex,
       width: width,
     );
+  }
+
+  static Future<List<FileToolsFileInfo>> queryFileList(
+    FileToolsDocumentType type,
+  ) {
+    return FileToolsService.instance.queryFileList(type);
+  }
+
+  static FileToolsDocumentType? matchDocumentsType(String path) {
+    return FileToolsService.instance.matchDocumentsType(path);
+  }
+
+  /// 应用内预览类型（含 ZIP 目录树），与 [matchDocumentsType] 文件工具分类独立。
+  static PreviewDocumentKind detectPreviewDocumentKind(String fileName) {
+    return resolvePreviewDocumentKind(fileName);
+  }
+
+  static Future<FileToolsFileInfo?> renameFile({
+    required FileToolsFileInfo fileInfo,
+    required String newNameWithoutExtension,
+  }) {
+    return FileToolsService.instance.renameFile(
+      fileInfo: fileInfo,
+      newNameWithoutExtension: newNameWithoutExtension,
+    );
+  }
+
+  static Future<bool> deleteFile(String path) {
+    return FileToolsService.instance.deleteFile(path);
+  }
+
+  static Future<bool> fileExists(String path) {
+    return FileToolsService.instance.fileExists(path);
+  }
+
+  static List<FileToolsFileInfo> sortFileList(
+    List<FileToolsFileInfo> fileList,
+    FileToolsSortType sortType,
+  ) {
+    return FileToolsService.instance.sortFileList(fileList, sortType);
+  }
+
+  static Future<FileToolsFileInfo> mergePdfFiles({
+    required List<FileToolsFileInfo> fileList,
+    FileToolsProgressCallback? onProgress,
+    FileToolsTaskControl? taskControl,
+  }) {
+    return FileToolsService.instance.mergePdfFiles(
+      fileList: fileList,
+      onProgress: onProgress,
+      taskControl: taskControl,
+    );
+  }
+
+  static Future<FileToolsFileInfo> splitPdfFile({
+    required FileToolsFileInfo fileInfo,
+    required List<int> selectedPageIndexList,
+    FileToolsProgressCallback? onProgress,
+    FileToolsTaskControl? taskControl,
+  }) {
+    return FileToolsService.instance.splitPdfFile(
+      fileInfo: fileInfo,
+      selectedPageIndexList: selectedPageIndexList,
+      onProgress: onProgress,
+      taskControl: taskControl,
+    );
+  }
+
+  static Future<FileToolsFileInfo> convertWordToPdfFile({
+    required FileToolsFileInfo fileInfo,
+    FileToolsProgressCallback? onProgress,
+    FileToolsTaskControl? taskControl,
+  }) {
+    return FileToolsService.instance.convertWordToPdfFile(
+      fileInfo: fileInfo,
+      onProgress: onProgress,
+      taskControl: taskControl,
+    );
+  }
+
+  static Future<FileToolsFileInfo> convertPdfToWordFile({
+    required FileToolsFileInfo fileInfo,
+    FileToolsProgressCallback? onProgress,
+    FileToolsTaskControl? taskControl,
+  }) {
+    return FileToolsService.instance.convertPdfToWordFile(
+      fileInfo: fileInfo,
+      onProgress: onProgress,
+      taskControl: taskControl,
+    );
+  }
+
+  static Future<FileToolsFileInfo> extractPdfTextFile({
+    required FileToolsFileInfo fileInfo,
+    required List<int> selectedPageIndexList,
+    FileToolsProgressCallback? onProgress,
+    FileToolsTaskControl? taskControl,
+  }) {
+    return FileToolsService.instance.extractPdfTextFile(
+      fileInfo: fileInfo,
+      selectedPageIndexList: selectedPageIndexList,
+      onProgress: onProgress,
+      taskControl: taskControl,
+    );
+  }
+
+  static Future<List<FileToolsFileInfo>> queryAllImages() {
+    return FileToolsService.instance.queryAllImages();
+  }
+
+  static Future<FileToolsFileInfo> generatePdfFromImages({
+    required List<FileToolsFileInfo> imageList,
+    String? outputFileName,
+    FileToolsProgressCallback? onProgress,
+    FileToolsTaskControl? taskControl,
+  }) {
+    return FileToolsService.instance.generatePdfFromImages(
+      imageList: imageList,
+      outputFileName: outputFileName,
+      onProgress: onProgress,
+      taskControl: taskControl,
+    );
+  }
+
+  static Future<FileToolsPdfToImagesZipResult> extractPdfToImagesZip({
+    required List<FileToolsFileInfo> fileList,
+    FileToolsProgressCallback? onProgress,
+    FileToolsTaskControl? taskControl,
+  }) {
+    return FileToolsService.instance.extractPdfToImagesZip(
+      fileList: fileList,
+      onProgress: onProgress,
+      taskControl: taskControl,
+    );
+  }
+
+  static Future<int> savePdfImagesToGallery({
+    required List<FileToolsFileInfo> fileList,
+    FileToolsProgressCallback? onProgress,
+  }) {
+    return FileToolsService.instance.savePdfImagesToGallery(
+      fileList: fileList,
+      onProgress: onProgress,
+    );
+  }
+
+  static Future<Uint8List?> queryPdfImage({
+    required FileToolsFileInfo fileInfo,
+    required int pageIndex,
+    int? width,
+  }) {
+    return FileToolsService.instance.queryPdfImage(
+      fileInfo: fileInfo,
+      pageIndex: pageIndex,
+      width: width,
+    );
+  }
+
+  static Future<String> queryNextScanPdfName() {
+    return FileToolsService.instance.queryNextScanPdfName();
   }
 }

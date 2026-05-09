@@ -1,19 +1,23 @@
 name: flutter_preview_file
-description: "Reusable preview and edit widgets for PDF, Word, and Excel files."
-version: 0.0.1
-homepage: https://github.com/chengmengyi/flutter_preview_file
+description: "Reusable preview and edit widgets for PDF, Word, Excel, text/code, and ZIP archive browsing."
+version: 0.0.6
+homepage: https://github.com/itqdtgcom/flutter_preview_file
+repository: https://github.com/itqdtgcom/flutter_preview_file
+issue_tracker: https://github.com/itqdtgcom/flutter_preview_file/issues
 
 environment:
-  sdk: ^3.9.2
+  sdk: '>=3.4.0 <4.0.0'
   flutter: '>=3.3.0'
 
 dependencies:
   flutter:
     sdk: flutter
   archive: ^3.6.1
+  gbk_codec: ^0.4.0
   excel: 4.0.6
   flutter_html: ^3.0.0
   pdf: ^3.12.0
+  photo_manager: ">=3.5.0 <4.0.0"
   printing: ^5.14.3
   plugin_platform_interface: ^2.0.2
   syncfusion_flutter_pdf: 32.2.9
